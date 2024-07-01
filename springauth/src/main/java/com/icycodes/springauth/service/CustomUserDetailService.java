@@ -41,8 +41,6 @@ public class CustomUserDetailService implements UserDetailsService {
                 true,
                 getAuthorities(List.of(user.getRole()))
         );
-
-        return null;
     }
 
     private Collection<? extends GrantedAuthority> getAuthorities(List<String> roles) {

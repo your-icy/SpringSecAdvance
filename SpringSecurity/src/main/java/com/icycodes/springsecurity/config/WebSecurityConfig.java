@@ -1,6 +1,5 @@
 package com.icycodes.springsecurity.config;
 
-import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -12,7 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
 @Configuration
-public class WebSecurity {
+public class WebSecurityConfig{
 
     private static final String[] WHITE_LIST_URLS = {
             "/register", "/verifyRegistration*" , "/resendVerifyToken*", "/changePassword",
@@ -31,8 +30,22 @@ public class WebSecurity {
 
         http.csrf(Customizer.withDefaults())
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(request -> {request.requestMatchers(WHITE_LIST_URLS).permitAll();});
-        return http.build();
+                .authorizeHttpRequests(request -> {
+                    try {
+                        request.requestMatchers(WHITE_LIST_URLS).permitAll()
+                                .requestMatchers("/api/**").authenticated()
+                                .and().oauth2Login(oAuth2Login ->
+                                        oAuth2Login.loginPage("oauth2/authorization/api-client-oidc")
+                                )
+                                .oauth2Login(Customizer.withDefaults());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+            return http.build();
     }
+
+
 
 }
